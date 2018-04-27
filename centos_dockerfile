@@ -1,0 +1,53 @@
+From centos:7.3.1611
+
+ADD realweb_8k ./realweb_8k
+ADD req.txt ./req.txt
+ADD DeepSpeech ./DeepSpeech
+ADD swig-3.0.8 ./swig-3.0.8
+ADD steps.sh ./steps.sh
+ADD srilm ./srilm
+
+
+ # Install yum dependencies
+ RUN yum -y update && \
+     yum groupinstall -y development && \
+     yum groupinstall 'Development Tools' && \
+     yum install -y \
+     bzip2-devel \
+     git \
+     hostname \
+     openssl \
+     openssl-devel \
+     sqlite-devel \
+     sudo \
+     tar \
+     wget \
+     zlib-dev \
+     python-devel  \
+     python-setuptools  \
+     bison  \
+     python2-falcon \
+     python-wheel \
+     pcre-devel \
+     automake \
+     boost-devel \
+     tcsh \
+     tcl \
+     tcl-devel
+
+RUN yum upgrade python-setuptools
+RUN easy_install pip
+RUN easy_install gunicorn
+RUN yes | pip install https://github.com/kpu/kenlm/archive/master.zip
+
+RUN yes |pip install -r req.txt
+RUN chmod +x steps.sh
+RUN ./steps.sh
+
+WORKDIR realweb_8k
+RUN chmod +x start.sh
+CMD ./start.sh 
+#RUN exit
+#CMD ./start.sh
+#CMD sudo bash start.sh                
+EXPOSE 8080
